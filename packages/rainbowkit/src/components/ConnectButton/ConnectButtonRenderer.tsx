@@ -1,8 +1,6 @@
 import React, { ReactNode, useContext } from 'react';
-import { useAccount, useBalance, useNetwork } from 'wagmi';
+import { useAccount, useNetwork } from 'wagmi';
 import { useIsMounted } from '../../hooks/useIsMounted';
-import { useMainnetEnsAvatar } from '../../hooks/useMainnetEnsAvatar';
-import { useMainnetEnsName } from '../../hooks/useMainnetEnsName';
 import { useRecentTransactions } from '../../transactions/useRecentTransactions';
 import { useAsyncImage } from '../AsyncImage/useAsyncImage';
 import {
@@ -17,9 +15,7 @@ import {
 } from '../RainbowKitProvider/ModalContext';
 import { useRainbowKitChainsById } from '../RainbowKitProvider/RainbowKitChainContext';
 import { ShowRecentTransactionsContext } from '../RainbowKitProvider/ShowRecentTransactionsContext';
-import { abbreviateETHBalance } from './abbreviateETHBalance';
 import { formatAddress } from './formatAddress';
-import { formatENS } from './formatENS';
 
 const noop = () => {};
 
@@ -32,8 +28,6 @@ export interface ConnectButtonRendererProps {
       balanceSymbol?: string;
       displayBalance?: string;
       displayName: string;
-      ensAvatar?: string;
-      ensName?: string;
       hasPendingTransactions: boolean;
     };
     chain?: {
@@ -60,9 +54,6 @@ export function ConnectButtonRenderer({
 }: ConnectButtonRendererProps) {
   const mounted = useIsMounted();
   const { address } = useAccount();
-  const ensAvatar = useMainnetEnsAvatar(address);
-  const ensName = useMainnetEnsName(address);
-  const { data: balanceData } = useBalance({ addressOrName: address });
   const { chain: activeChain } = useNetwork();
   const rainbowkitChainsById = useRainbowKitChainsById();
   const authenticationStatus = useAuthenticationStatus() ?? undefined;
@@ -80,12 +71,6 @@ export function ConnectButtonRenderer({
     useRecentTransactions().some(({ status }) => status === 'pending') &&
     showRecentTransactions;
 
-  const displayBalance = balanceData
-    ? `${abbreviateETHBalance(parseFloat(balanceData.formatted))} ${
-        balanceData.symbol
-      }`
-    : undefined;
-
   const { openConnectModal } = useConnectModal();
   const { openChainModal } = useChainModal();
   const { openAccountModal } = useAccountModal();
@@ -98,15 +83,7 @@ export function ConnectButtonRenderer({
         account: address
           ? {
               address,
-              balanceDecimals: balanceData?.decimals,
-              balanceFormatted: balanceData?.formatted,
-              balanceSymbol: balanceData?.symbol,
-              displayBalance,
-              displayName: ensName
-                ? formatENS(ensName)
-                : formatAddress(address),
-              ensAvatar: ensAvatar ?? undefined,
-              ensName: ensName ?? undefined,
+              displayName: formatAddress(address),
               hasPendingTransactions,
             }
           : undefined,

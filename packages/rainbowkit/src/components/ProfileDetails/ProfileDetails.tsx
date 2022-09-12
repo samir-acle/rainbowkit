@@ -1,12 +1,10 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { useAccount, useBalance, useEnsAvatar, useEnsName } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { isMobile } from '../../utils/isMobile';
 import { Avatar } from '../Avatar/Avatar';
 import { Box } from '../Box/Box';
 import { CloseButton } from '../CloseButton/CloseButton';
-import { abbreviateETHBalance } from '../ConnectButton/abbreviateETHBalance';
 import { formatAddress } from '../ConnectButton/formatAddress';
-import { formatENS } from '../ConnectButton/formatENS';
 import { CopiedIcon } from '../Icons/Copied';
 import { CopyIcon } from '../Icons/Copy';
 import { DisconnectIcon } from '../Icons/Disconnect';
@@ -17,18 +15,12 @@ import { ProfileDetailsAction } from './ProfileDetailsAction';
 
 interface ProfileDetailsProps {
   address: ReturnType<typeof useAccount>['address'];
-  balanceData: ReturnType<typeof useBalance>['data'];
-  ensAvatar: ReturnType<typeof useEnsAvatar>['data'];
-  ensName: ReturnType<typeof useEnsName>['data'];
   onClose: () => void;
   onDisconnect: () => void;
 }
 
 export function ProfileDetails({
   address,
-  balanceData,
-  ensAvatar,
-  ensName,
   onClose,
   onDisconnect,
 }: ProfileDetailsProps) {
@@ -55,11 +47,7 @@ export function ProfileDetails({
     return null;
   }
 
-  const accountName = ensName ? formatENS(ensName) : formatAddress(address);
-  const ethBalance = balanceData?.formatted;
-  const displayBalance = ethBalance
-    ? abbreviateETHBalance(parseFloat(ethBalance))
-    : undefined;
+  const accountName = formatAddress(address);
   const titleId = 'rk_profile_title';
   const mobile = isMobile();
 
@@ -89,7 +77,7 @@ export function ProfileDetails({
             <Box marginTop={mobile ? '24' : '0'}>
               <Avatar
                 address={address}
-                imageUrl={ensAvatar}
+                imageUrl={null}
                 size={mobile ? 82 : 74}
               />
             </Box>
@@ -110,19 +98,6 @@ export function ProfileDetails({
                   {accountName}
                 </Text>
               </Box>
-              {balanceData && (
-                <Box textAlign="center">
-                  <Text
-                    as="h1"
-                    color="modalTextSecondary"
-                    id={titleId}
-                    size={mobile ? '16' : '14'}
-                    weight="semibold"
-                  >
-                    {displayBalance} {balanceData.symbol}
-                  </Text>
-                </Box>
-              )}
             </Box>
           </Box>
           <Box

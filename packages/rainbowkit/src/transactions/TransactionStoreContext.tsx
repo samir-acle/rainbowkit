@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { providers } from 'ethers';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAccount, useProvider } from 'wagmi';
